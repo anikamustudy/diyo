@@ -1,0 +1,110 @@
+name: Deploy React & Laravel Project
+
+on:
+  push:
+    branches:
+      - main  # Trigger the action on push to main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2.28'  # Set PHP version based on your Laravel requirements
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'  # Set Node.js version based on your React project requirements
+
+      - name: Install Dependencies
+        run: |
+          # Install Laravel dependencies
+          cd backend  # Assuming Laravel is in the 'backend' directory
+          composer install --no-interaction --prefer-dist
+
+          # Install React dependencies
+          cd ../frontend  # Assuming React is in the 'frontend' directory
+          npm install
+
+      - name: Build React App
+        run: |
+          cd frontend
+          npm run build  # Build the React app for production
+
+      - name: Copy React build to Laravel public directory
+        run: |
+          cd frontend
+          cp -r build/* ../backend/public/  # Copy React build to Laravel's public directory
+
+      - name: Deploy to Server (via SSH)
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.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 }}  # Add SSH private key in GitHub secrets
+          SERVER_USER: ${{ secrets.nepal }}  # Add SSH username in GitHub secrets
+          SERVER_HOST: ${{ secrets.https://bank-hmuo.onrender.com/ }}  # Add server IP in GitHub secrets
+        run: |
+          echo "$SSH_PRIVATE_KEY" > private_key.pem
+          chmod 600 private_key.pem
+          ssh -i private_key.pem $SERVER_USER@$SERVER_HOST << 'EOF'
+            cd /path/to/your/project/backend
+            git pull origin main  # Pull the latest code
+            composer install --no-interaction --prefer-dist  # Install Laravel dependencies
+            php artisan migrate --force  # Run database migrations
+            php artisan config:cache  # Cache the config
+            php artisan route:cache  # Cache the routes
+            npm install  # Reinstall npm dependencies if needed
+            npm run prod  # Run production build for React if not copied
+            sudo service apache2 restart  # Restart your web server (Apache/Nginx)
+          EOF
